@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Simple classroom website for learning CI/CD">
+  <title>Customer Order Status | Day 1 CI/CD</title>
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <main class="panel">
+    <p class="eyebrow">DAY 1 • GITHUB ACTIONS</p>
+    <h1 id="app-title">Customer Order Status</h1>
+    <p class="lead">A tiny website used to learn automatic CI/CD pipelines.</p>
+    <div class="status-row">
+      <span class="muted">Service status</span>
+      <span id="service-status" class="status">Healthy</span>
+    </div>
+    <div class="status-row">
+      <span class="muted">Release</span>
+      <strong id="release-version">v1.0</strong>
+    </div>
+    <div class="status-row">
+      <span class="muted">Deployed commit</span>
+      <code id="build-sha">Loading…</code>
+    </div>
+    <p class="hint">Edit this page on GitHub, commit and watch your workflow run.</p>
+  </main>
+  <script src="./app.js"></script>
+</body>
+</html>
