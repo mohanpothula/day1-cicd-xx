@@ -1,0 +1,73 @@
+name: Day 1 - Website CI/CD
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'site/**'
+      - 'tests/**'
+      - 'scripts/**'
+      - '.github/workflows/ci-cd.yml'
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# Serialize deployments so two classroom edits do not deploy in parallel.
+concurrency:
+  group: github-pages-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  test_and_build:
+    name: Test and build website
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download repository files
+        uses: actions/checkout@v4
+
+      - name: Install Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Run automated tests
+        run: python -m unittest discover -s tests -v
+
+      - name: Build static website
+        run: python scripts/build_site.py
+
+      - name: Save downloadable build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: website-build
+          path: dist/
+
+      - name: Configure GitHub Pages
+        if: github.event_name != 'pull_request'
+        uses: actions/configure-pages@v5
+
+      - name: Upload GitHub Pages artifact
+        if: github.event_name != 'pull_request'
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: dist/
+
+  deploy:
+    name: Deploy website
+    # A failed test_and_build job prevents this job from running.
+    needs: test_and_build
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
